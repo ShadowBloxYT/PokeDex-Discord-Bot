@@ -1,0 +1,10 @@
+# Library dependecies. You need to install these before running the code. #
+#																		  #
+# To install,															  #
+#	pip install -r requirements.txt										  #
+#																		  #
+###########################################################################
+
+### Essential ###
+requests
+discord>=1.0.1
