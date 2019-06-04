@@ -4,9 +4,8 @@ import json
 class Pokemon:
 
     def __init__(self, data):
-        """
-        Build a Pokemon class from the PokeDex data from PokeAPI 
-        """
+        """Build a Pokemon class from the PokeDex data from PokeAPI"""
+        self.ID = data['id']
         self._name = data['name']
         self._height = data['height']
         self._init_stats(data)
@@ -103,9 +102,7 @@ class Pokemon:
 class Berry:
 
     def __init__(self, data):
-        """
-        Build a Berry class from the PokeDex data from PokeAPI 
-        """
+        """Build a Berry class from the PokeDex data from PokeAPI"""
         self._name = data['name']
         self._firmness = data['firmness']['name']
         self._size = data['size']
@@ -166,4 +163,34 @@ class Berry:
 
     def sprite_link(self):
         return self._sprite
+
+class Ability:
+
+    def __init__(self, data):
+        """Build an Ability class from the PokeDex data from PokeAPI"""
+
+        self._name = data['name']
+        self._generation = data['generation']['name']
+        self._effect = data['effect_entries'][0]['effect']
+
+    def str_rep(self):
+
+        result = self._name.capitalize() + ":\n"
+        result += "Generation: {}\n".format(self._generation)
+        result += "Effect: {}\n".format(self._effect)
+
+        return result
+
+class PokeSound:
+
+    URL_BASE = "https://pokemoncries.com/cries/"
+
+    def __init__(self, pokeID):
+        self._ID = pokeID
+        self._audioType = ".mp3"
+
+    def get_link(self):
+        return PokeSound.URL_BASE + str(self._ID) + self._audioType
+
+        
     

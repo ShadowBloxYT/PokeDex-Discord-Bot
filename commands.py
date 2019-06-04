@@ -33,7 +33,7 @@ class PokemonCommand(BaseCommand):
         except IndexError:
             await message.channel.send("You must include a pokemon to search for!")
 
-        pokemon = PokeDex.get_pokemon(target)
+        pokemon = PokeDex.get_entry("pokemon", target)
         await post_pokemon_data(message, pokemon)
 
 class BerryCommand(BaseCommand):
@@ -47,8 +47,22 @@ class BerryCommand(BaseCommand):
         except IndexError:
             await message.channel.send("You must include a berry to search for!")
 
-        berry = PokeDex.get_berry(target)
+        berry = PokeDex.get_entry("berry", target)
         await post_berry_data(message, berry)
+
+class AbilityCommand(BaseCommand):
+
+    _key = "$ability"
+    _help_message = "$ability - Display the PokeDex data for an ability"
+    
+    async def execute_command(self, message):
+        try:
+            target = message.content.split()[1]
+        except IndexError:
+            await message.channel.send("You must include an ability to search for!")
+
+        ability = PokeDex.get_entry("ability", target)
+        await post_ability_data(message, ability)
 
 class RandomPokemonCommand(BaseCommand):
 
@@ -56,7 +70,7 @@ class RandomPokemonCommand(BaseCommand):
     _help_message = "$randompokemon - Display the pokemon data for a random pokemon"
     
     async def execute_command(self, message):
-        pokemon = PokeDex.get_random_pokemon()
+        pokemon = PokeDex.get_random_entry("pokemon")
         await post_pokemon_data(message, pokemon)
 
 class RandomBerryCommand(BaseCommand):
@@ -65,8 +79,43 @@ class RandomBerryCommand(BaseCommand):
     _help_message = "$randomberry - Display the PokeDex data for a random berry"
     
     async def execute_command(self, message):
-        berry = PokeDex.get_random_berry()
+        berry = PokeDex.get_random_entry("berry")
         await post_berry_data(message, berry)
+
+class RandomAbilityCommand(BaseCommand):
+
+    _key = "$randomability"
+    _help_message = "$randomability - Display the PokeDex data for a random ability"
+    
+    async def execute_command(self, message):
+        ability = PokeDex.get_random_entry("ability")
+        await post_ability_data(message, ability)
+
+class PokeSoundCommand(BaseCommand):
+
+    _key = "$pokesound"
+    _help_message = "$pokesound [pokemon] - Play the cry for [pokemon]"
+    
+    async def execute_command(self, message):
+        try:
+            target = message.content.split()[1]
+        except IndexError:
+            await message.channel.send("You must include a pokemon!")
+
+        sound_link = PokeDex.get_pokemon_sound(target)
+        voice = message.author.voice
+        if voice != None and sound_link != None:
+            try:
+                voicesource = await voice.channel.connect()
+            except discord.ClientException:
+                print("I'm already in a voice channel! Please wait!")
+                return
+            source = discord.FFmpegPCMAudio(sound_link)
+            voicesource.play(source)
+            while voicesource.is_playing():
+                continue
+            
+            await voicesource.disconnect()
 
 class KillCommand(BaseCommand):
 
@@ -110,7 +159,7 @@ async def post_pokemon_data(message, pokemon):
     else:
         e = discord.Embed()
         e.set_image(url=pokemon.sprite_link())
-        await message.channel.send(pokemon.name())
+        await message.channel.send(pokemon.name() + "PokeDex ID: {}\n".format(pokemon.ID))
         await message.channel.send(embed=e)
         result = pokemon.height() + pokemon.weight() + pokemon.types() + pokemon.stats()
         await message.channel.send(result)
@@ -127,9 +176,17 @@ async def post_berry_data(message, berry):
         result = berry.size() + berry.firmness() + berry.effect() + berry.flavors()
         await message.channel.send(result)
 
+async def post_ability_data(message, ability):
+    """Posts a ability's data to a Discord text channel."""
+    if not ability:
+        await message.channel.send("Sorry, something went wrong!")
+    else:
+        await message.channel.send(ability.str_rep())
+
 class Commands:
 
-    COMMAND_COUNT = 8
+    COMMAND_COUNT = 11
     COMMANDS = [BaseCommand(), PokemonCommand(), RandomPokemonCommand(),
                 KillCommand(), HeadshotCommand(), BoardCommand(),
-                BerryCommand(), RandomBerryCommand()]
+                BerryCommand(), RandomBerryCommand(), AbilityCommand(),
+                RandomAbilityCommand(), PokeSoundCommand()]

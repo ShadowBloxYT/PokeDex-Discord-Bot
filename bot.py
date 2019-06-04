@@ -15,5 +15,5 @@ async def on_message(message):
         if command.check_input(message):
             await command.execute_command(message)
             return
-        
+
 client.run(os.environ['BOT_KEY'])

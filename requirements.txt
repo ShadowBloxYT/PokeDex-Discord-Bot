@@ -8,3 +8,9 @@
 ### Essential ###
 requests
 discord>=1.0.1
+discord.py[voice]
+
+### Dependencies ###
+# To send data over voice channels, you will need to load the Opus library. http://opus-codec.org/
+# Windows users will already have Opus loaded on start. See https://discordpy.readthedocs.io/en/latest/api.html#opus-library
+# for more info
